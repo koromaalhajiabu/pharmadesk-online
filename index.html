@@ -37,6 +37,9 @@ function normalizeProjectUrl(raw){
 }
 
 async function connect(rawUrl, key) {
+  message('Connecting to Supabase… please wait.');
+  const connectButton = $('#connectNow');
+  if (connectButton) { connectButton.disabled = true; connectButton.textContent = 'Connecting…'; }
   try {
     if (!window.supabase) {
       throw Error('Supabase library failed to load. Check your internet.');
@@ -62,7 +65,9 @@ async function connect(rawUrl, key) {
     }
   } catch (e) {
     connected(false);
-    message(e.message || String(e), true);
+    message('Connection failed: ' + (e.message || String(e)) + ' If this persists, send me the exact error shown here.', true);
+  } finally {
+    if (connectButton) { connectButton.disabled = false; connectButton.textContent = 'Connect'; }
   }
 }
 
