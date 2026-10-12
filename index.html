@@ -12,6 +12,28 @@
 <section class="view panel hidden" id="v-suppliers"><h2>Add supplier</h2><form id="vf"><div class="grid"><div class="field"><label>Supplier name *</label><input name="name" required maxlength="120"></div><div class="field"><label>Phone</label><input name="phone" maxlength="50"></div><div class="field"><label>Contact person</label><input name="contact_person" maxlength="100"></div><div class="field"><label>Notes</label><input name="notes" maxlength="200"></div></div><div class="actions"><button>Save supplier</button></div></form><h2 style="margin-top:18px">Supplier directory</h2><div class="tablewrap"><table><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Notes</th></tr></thead><tbody id="suppliers"></tbody></table></div></section>
 <section class="view panel hidden" id="v-reports"><h2>Sales report</h2><div class="grid"><div class="field"><label>From date</label><input type="date" id="from"></div><div class="field"><label>To date</label><input type="date" id="to"></div></div><div class="actions"><button id="run" type="button">Update report</button><button type="button" class="secondary" onclick="window.print()">Print</button></div><div id="report"></div><p class="hint">Estimated gross profit excludes overheads, taxes, discounts and unpaid balances.</p></section></div></main><footer>PharmaDesk Online · Cloud records<strong>Designed by Alhaji Abu Koroma</strong></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/@supabase/supabase-js@2"></script><script>
+window.addEventListener('error',function(e){var m=document.getElementById('msg');if(m&&e.message){m.textContent='Page script error: '+e.message;m.className='msg err';m.classList.remove('hidden');}});
+window.pharmaDirectConnect=async function(){
+ var b=document.getElementById('connectNow'),m=document.getElementById('msg');
+ var show=function(t,bad){if(m){m.textContent=t;m.className='msg'+(bad?' err':'');m.classList.remove('hidden');}};
+ var u=(document.getElementById('url')||{}).value||'',k=((document.getElementById('key')||{}).value||'').trim();
+ if(b){b.disabled=true;b.textContent='Connecting…';}
+ show('Connect button is working. Checking the cloud service…');
+ try{
+  if(!window.supabase)throw Error('Supabase library is not available in this browser.');
+  if(!u.trim()||!k)throw Error('Enter both the project URL and publishable key.');
+  var client=window.supabase.createClient(u.trim().replace(/\/$/,''),k);
+  var out=await Promise.race([client.auth.getSession(),new Promise(function(_,rej){setTimeout(function(){rej(Error('Timed out after 15 seconds.'));},15000);})]);
+  if(out.error)throw out.error;
+  localStorage.setItem('pharma_url',u.trim().replace(/\/$/,''));localStorage.setItem('pharma_key',k);
+  show('Cloud connection successful. Preparing sign-in…');
+  document.getElementById('conn').textContent='Cloud connection configured';
+  document.getElementById('config').classList.add('hidden');
+  document.getElementById('auth').classList.remove('hidden');
+ }catch(e){show('Connection failed: '+(e&&e.message?e.message:String(e)),true);}
+ finally{if(b){b.disabled=false;b.textContent='Connect';}}
+};
+</script><script>
 (()=>{'use strict';const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const money=n=>'Le '+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),today=()=>new Date().toISOString().slice(0,10);
 const P='pharma';let sb=null,user=null,prods=[],sales=[],receipts=[],suppliers=[],live=null;
 function message(t,err=false){$('#msg').textContent=t;$('#msg').className='msg'+(err?' err':'');$('#msg').classList.remove('hidden')}
