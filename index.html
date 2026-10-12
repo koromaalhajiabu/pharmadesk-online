@@ -18,8 +18,59 @@ function message(t,err=false){$('#msg').textContent=t;$('#msg').className='msg'+
 function formdata(f){return Object.fromEntries(new FormData(f).entries())}
 function tables(){return [P+'_products',P+'_sales',P+'_stock_receipts',P+'_suppliers']}
 function connected(ok){$('#conn').textContent=ok?'Cloud connection configured':'Cloud not configured';$('#config').classList.toggle('hidden',ok);$('#auth').classList.toggle('hidden',!ok)}
-async function connect(url,key){try{if(!window.supabase)throw Error('Supabase library could not load; check internet.');sb=window.supabase.createClient(url,key);localStorage.setItem(P+'_url',url);localStorage.setItem(P+'_key',key);connected(true);await session()}catch(e){message(e.message,true)}}
-$('#cf').onsubmit=e=>{e.preventDefault();connect($('#url').value.trim().replace(/\/$/,''),$('#key').value.trim())};
+
+function normalizeProjectUrl(raw){
+  let u;
+  try { u = new URL(String(raw || '').trim()); }
+  catch { throw Error('Invalid Supabase Project URL.'); }
+  if (u.protocol !== 'https:') {
+    throw Error('The Project URL must begin with https://');
+  }
+  if (!u.hostname.endsWith('.supabase.co')) {
+    throw Error('Use the Project URL from Supabase Settings.');
+  }
+  u.search = '';
+  u.hash = '';
+  u.pathname = u.pathname.replace(/\/+$/, '');
+  u.pathname = u.pathname.replace(/\/(rest\/v1|auth\/v1|storage\/v1|realtime\/v1)$/, '');
+  return u.origin;
+}
+
+async function connect(rawUrl, key) {
+  try {
+    if (!window.supabase) {
+      throw Error('Supabase library failed to load. Check your internet.');
+    }
+    const url = normalizeProjectUrl(rawUrl);
+    if (!key) throw Error('Enter your public Supabase key.');
+
+    const client = window.supabase.createClient(url, key);
+    const { data, error } = await client.auth.getSession();
+    if (error) throw Error('Supabase Auth error: ' + error.message);
+
+    sb = client;
+    localStorage.setItem(P + '_url', url);
+    localStorage.setItem(P + '_key', key);
+    connected(true);
+    user = data.session?.user || null;
+    authUI();
+
+    if (user) {
+      await refresh();
+    } else {
+      message('Connection check passed. You can now create an account or sign in.');
+    }
+  } catch (e) {
+    connected(false);
+    message(e.message || String(e), true);
+  }
+}
+
+$('#cf').onsubmit = e => {
+  e.preventDefault();
+  connect($('#url').value, $('#key').value.trim());
+};
+
 $('#forget').onclick=()=>{if(confirm('Forget cloud settings on this device?')){localStorage.removeItem(P+'_url');localStorage.removeItem(P+'_key');location.reload()}};
 async function session(){const {data,error}=await sb.auth.getSession();if(error)return message(error.message,true);user=data.session?.user||null;authUI();if(user)await refresh()}
 function authUI(){$('#app').classList.toggle('hidden',!user);$('#signin').classList.toggle('hidden',!!user);$('#signup').classList.toggle('hidden',!!user);$('#signout').classList.toggle('hidden',!user);$('#authnote').textContent=user?'Signed in as '+user.email:'Create an account, then use the setup guide to grant shop access.'}
