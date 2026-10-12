@@ -1,9 +1,9 @@
 {
-  "id": "/pharmadesk-online/provisiondesk-installed",
+  "id": "/pharmadesk-online/provisiondesk-v4-installed",
   "name": "ProvisionDesk Provision Shop",
   "short_name": "ProvisionDesk",
   "description": "Provision shop stock and sales management",
-  "start_url": "/pharmadesk-online/provision.html?app=provisiondesk-installed",
+  "start_url": "/pharmadesk-online/provision.html?app=provisiondesk-v4-installed&launch=4",
   "scope": "/pharmadesk-online/",
   "display": "standalone",
   "orientation": "portrait",
