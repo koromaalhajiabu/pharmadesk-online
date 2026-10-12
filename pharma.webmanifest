@@ -1,17 +1,17 @@
 {
-  "id": "./",
+  "id": "/pharmadesk-online/pharmadesk-app",
   "name": "PharmaDesk Online",
   "short_name": "PharmaDesk",
   "description": "Pharmacy stock and sales management",
-  "start_url": "./?source=pwa",
-  "scope": "./",
+  "start_url": "/pharmadesk-online/?app=pharmadesk",
+  "scope": "/pharmadesk-online/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f3f6fa",
   "theme_color": "#123d72",
   "icons": [
     {
-      "src": "pharmadesk-icon.svg",
+      "src": "/pharmadesk-online/pharmadesk-icon-v2.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
