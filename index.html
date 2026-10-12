@@ -71,13 +71,19 @@ async function connect(rawUrl, key) {
   }
 }
 
-$('#connectNow').addEventListener('click', () => {
+window.pharmaConnect = async function() {
   const rawUrl = $('#url').value.trim();
   const publicKey = $('#key').value.trim();
   if (!rawUrl) return message('Please enter your Supabase project URL.', true);
   if (!publicKey) return message('Please enter your public Supabase key.', true);
-  connect(rawUrl, publicKey);
-});
+  const b = $('#connectNow');
+  if (b) { b.disabled = true; b.textContent = 'Connecting…'; }
+  message('Connect button is working. Testing Supabase…');
+  try { await connect(rawUrl, publicKey); }
+  catch (e) { message('Connection failed: ' + (e && e.message ? e.message : String(e)), true); }
+  finally { if (b) { b.disabled = false; b.textContent = 'Connect'; } }
+};
+$('#connectNow').onclick = window.pharmaConnect;
 $('#cf').onsubmit = e => {
   e.preventDefault();
   connect($('#url').value, $('#key').value.trim());
