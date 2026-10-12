@@ -1,17 +1,17 @@
 {
-  "id": "./provisiondesk-app",
+  "id": "/pharmadesk-online/provisiondesk-app",
   "name": "ProvisionDesk Online",
   "short_name": "ProvisionDesk",
   "description": "Provision shop stock and sales management",
-  "start_url": "./provision.html?app=provisiondesk",
-  "scope": "./",
+  "start_url": "/pharmadesk-online/provision.html?app=provisiondesk",
+  "scope": "/pharmadesk-online/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f3f6fa",
   "theme_color": "#123d72",
   "icons": [
     {
-      "src": "provisiondesk-icon-v2.svg",
+      "src": "/pharmadesk-online/provisiondesk-icon-v2.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
